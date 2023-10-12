@@ -19,12 +19,15 @@ public class MovementSystem : ISystem
         
         foreach (var movementComponent in _componentsToUpdate)
         {
+            var gravity = movementComponent.GetComponent<GravityComponent>();
+            if (gravity != null && gravity.isGrounded)
+                continue;
+            
             if (!CanMoveBlock(movementComponent, movementVector))
                 continue;
 
             var pos = movementComponent.transform.position + movementVector;
             movementComponent.transform.position = pos;
-
             UpdateWorldMatrix(movementComponent, movementVector);
         }
     }

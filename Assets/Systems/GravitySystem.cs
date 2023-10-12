@@ -19,8 +19,14 @@ public class GravitySystem : ISystem
         _componentsToUpdate = Object.FindObjectsOfType<GravityComponent>().ToList();
         foreach (var gravityComponent in _componentsToUpdate)
         {
-            if (!CanMoveBlockDownward(gravityComponent))
+            if (gravityComponent.isGrounded)
                 continue;
+            
+            if (!CanMoveBlockDownward(gravityComponent))
+            {
+                gravityComponent.isGrounded = true;
+                continue;
+            }
             
             var pos = gravityComponent.transform.position;
             pos.y -= Settings.gravity;

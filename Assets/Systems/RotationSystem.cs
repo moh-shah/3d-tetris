@@ -22,6 +22,10 @@ public class RotationSystem : ISystem
 
         foreach (var rotationComponent in _rotationComponentsToUpdate)
         {
+            var gravity = rotationComponent.GetComponent<GravityComponent>();
+            if (gravity != null && gravity.isGrounded)
+                continue;
+            
             if (!CanMoveBlock(rotationComponent, axis, out var rotatedPositions))
             {
                 continue;

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class UpdateSystem : MonoBehaviour
 {
@@ -7,19 +8,20 @@ public class UpdateSystem : MonoBehaviour
     
     private float _updateSecondsCounter;
     
+    [FormerlySerializedAs("_blockGenerationSystem")] [SerializeField] private BlockGenerationSystem blockGenerationSystem;
     private ISystem _inputSystem;
     private ISystem _gravitySystem;
     private ISystem _rotationSystem;
     private ISystem _movementSystem;
-    private ISystem _boxCollisionSystem;
-
+    private ISystem _blockDestructionSystem;
+ 
     private void Awake()
     {
         _inputSystem = new InputSystem();
         _gravitySystem = new GravitySystem();
         _rotationSystem = new RotationSystem();
         _movementSystem = new MovementSystem();
-        _boxCollisionSystem = new BoxCollisionSystem();
+        _blockDestructionSystem = new BlockDestructionSystem();
     }
 
     private void Update()
@@ -40,6 +42,8 @@ public class UpdateSystem : MonoBehaviour
         _inputSystem.OnSystemUpdate();
         _rotationSystem.OnSystemUpdate();
         _movementSystem.OnSystemUpdate();
-        ///_gravitySystem.OnSystemUpdate();
+        _gravitySystem.OnSystemUpdate();
+        blockGenerationSystem.OnSystemUpdate();
+        _blockDestructionSystem.OnSystemUpdate();
     }
 }

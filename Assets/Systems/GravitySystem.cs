@@ -16,6 +16,7 @@ public class GravitySystem : ISystem
 
     public void OnSystemUpdate()
     {
+        return;
         _componentsToUpdate = Object.FindObjectsOfType<GravityComponent>().ToList();
         foreach (var gravityComponent in _componentsToUpdate)
         {

@@ -8,7 +8,9 @@ public class UpdateSystem : MonoBehaviour
     
     private float _updateSecondsCounter;
     
-    [FormerlySerializedAs("_blockGenerationSystem")] [SerializeField] private BlockGenerationSystem blockGenerationSystem;
+    [FormerlySerializedAs("_blockGenerationSystem")]
+    [SerializeField] private BlockGenerationSystem blockGenerationSystem;
+    [SerializeField] private CameraRotationSystem cameraRotationSystem;
     private ISystem _inputSystem;
     private ISystem _gravitySystem;
     private ISystem _rotationSystem;
@@ -27,6 +29,7 @@ public class UpdateSystem : MonoBehaviour
     private void Update()
     {
         _inputSystem.OnFrameUpdate();
+        cameraRotationSystem.OnFrameUpdate();
         
         _updateSecondsCounter += Time.deltaTime;
         if (_updateSecondsCounter >= updateDelayInSeconds)
@@ -40,6 +43,7 @@ public class UpdateSystem : MonoBehaviour
     private void UpdateSystems()
     {
         _inputSystem.OnSystemUpdate();
+        cameraRotationSystem.OnSystemUpdate();
         _rotationSystem.OnSystemUpdate();
         _movementSystem.OnSystemUpdate();
         _gravitySystem.OnSystemUpdate();

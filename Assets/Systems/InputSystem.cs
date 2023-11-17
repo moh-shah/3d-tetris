@@ -2,39 +2,34 @@
 
 public class InputSystem : ISystem
 {
-    public const KeyCode RotationUp = KeyCode.UpArrow;
-    public const KeyCode RotationDown = KeyCode.DownArrow;
-    public const KeyCode RotationRight = KeyCode.RightArrow;
-    public const KeyCode RotationLeft = KeyCode.LeftArrow;
-
-    public const KeyCode MoveForward = KeyCode.W;
-    public const KeyCode MoveBackward = KeyCode.S;
-    public const KeyCode MoveRight = KeyCode.D;
-    public const KeyCode MoveLeft = KeyCode.A;
+    public const KeyCode MoveRight = KeyCode.RightArrow;
+    public const KeyCode MoveLeft = KeyCode.LeftArrow;
     
+    public const KeyCode RotateKey = KeyCode.UpArrow;
+    public const KeyCode RotateCameraKey = KeyCode.DownArrow;
     
-    private KeyCode? _lastRotationKey = null;
+    private bool _rotationKeyPressed;
     private KeyCode? _lastMoveKey = null;
+    private KeyCode? _cameraRotationRequest = null;
 
     public void OnFrameUpdate()
     {
-        if (Input.GetKeyUp(RotationUp)) _lastRotationKey = RotationUp;
-        //if (Input.GetKeyUp(RotationDown)) _lastRotationKey = RotationDown;
-        if (Input.GetKeyUp(RotationRight)) _lastRotationKey = RotationRight;
-        if (Input.GetKeyUp(RotationLeft)) _lastRotationKey = RotationLeft;
-        
-        if (Input.GetKeyUp(MoveForward)) _lastMoveKey = MoveForward;
-        if (Input.GetKeyUp(MoveBackward)) _lastMoveKey = MoveBackward;
+        if (Input.GetKeyUp(RotateKey)) _rotationKeyPressed = true;
+     
         if (Input.GetKeyUp(MoveRight)) _lastMoveKey = MoveRight;
         if (Input.GetKeyUp(MoveLeft)) _lastMoveKey = MoveLeft;
+        
+        if (Input.GetKeyUp(RotateCameraKey)) _cameraRotationRequest = RotateCameraKey;
     }
 
     public void OnSystemUpdate()
     {
-        BlackBoard.lastRotationKey = _lastRotationKey;
+        BlackBoard.rotationKeyPressed = _rotationKeyPressed;
         BlackBoard.lastMoveKey = _lastMoveKey;
+        BlackBoard.cameraRotationKeyPressed = _cameraRotationRequest != null;
         
-        _lastRotationKey = null;
+        _rotationKeyPressed = false;
         _lastMoveKey = null;
+        _cameraRotationRequest = null;
     }
 }

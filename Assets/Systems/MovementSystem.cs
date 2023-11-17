@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class MovementSystem : ISystem
 {
@@ -47,9 +49,43 @@ public class MovementSystem : ISystem
 
     private Vector3Int MovementVector()
     {
-        return BlackBoard.lastMoveKey.HasValue
-            ? Settings.keyToMovementDirection[BlackBoard.lastMoveKey.Value] * Settings.movementSpeed
-            : Vector3Int.zero;
+        if (BlackBoard.lastMoveKey.HasValue == false)
+            return Vector3Int.zero;
+
+        switch (BlackBoard.CameraPosition)
+        {
+            case CameraPosition.Front:
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveRight)
+                    return Vector3Int.right;
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveLeft)
+                    return Vector3Int.left;
+                break;
+            
+            case CameraPosition.Right:
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveRight)
+                    return Vector3Int.forward;
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveLeft)
+                    return Vector3Int.back;
+                break;
+            
+            case CameraPosition.Back:
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveRight)
+                    return -Vector3Int.right;
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveLeft)
+                    return -Vector3Int.left;
+                break;
+            
+            case CameraPosition.Left:
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveRight)
+                    return -Vector3Int.forward;
+                if (BlackBoard.lastMoveKey.Value == InputSystem.MoveLeft)
+                    return -Vector3Int.back;
+                break;
+        }
+        
+     
+        
+        return Vector3Int.zero;
     }
 
     private bool CanMoveBlock(MovementComponent movementComponent, Vector3Int dir)

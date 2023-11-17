@@ -17,7 +17,7 @@ public class RotationSystem : ISystem
     {
         _rotationComponentsToUpdate = Object.FindObjectsOfType<RotationComponent>().ToList();
         var axis = RotationAxis();
-        if (axis == Axis.Undefined)
+        if (axis.Item1 == Axis.Undefined)
             return;
 
         foreach (var rotationComponent in _rotationComponentsToUpdate)
@@ -25,7 +25,7 @@ public class RotationSystem : ISystem
             var gravity = rotationComponent.GetComponent<GravityComponent>();
             if (gravity != null && gravity.isGrounded)
                 continue;
-            
+
             if (!CanMoveBlock(rotationComponent, axis, out var rotatedPositions))
             {
                 continue;
@@ -35,15 +35,18 @@ public class RotationSystem : ISystem
             for (var index = 0; index < positionComponents.Count; index++)
             {
                 var positionComponent = positionComponents[index];
-                GameWorld.WorldMatrix[positionComponent.position.x, positionComponent.position.y,positionComponent.position.z] = false;
+                GameWorld.WorldMatrix[positionComponent.position.x, positionComponent.position.y,
+                    positionComponent.position.z] = false;
                 positionComponent.position = rotatedPositions[index];
                 positionComponent.gameObject.transform.position = positionComponent.position;
-                GameWorld.WorldMatrix[positionComponent.position.x, positionComponent.position.y,positionComponent.position.z] = true;
+                GameWorld.WorldMatrix[positionComponent.position.x, positionComponent.position.y,
+                    positionComponent.position.z] = true;
             }
         }
     }
 
-    private bool CanMoveBlock(RotationComponent rotationComponent, Axis axis, out List<Vector3Int> rotatedPositions)
+    private bool CanMoveBlock(RotationComponent rotationComponent, (Axis, int) axis,
+        out List<Vector3Int> rotatedPositions)
     {
         var positionComponents = GetPositionComponents(rotationComponent);
         return CanMove(positionComponents, axis, out rotatedPositions);
@@ -61,7 +64,8 @@ public class RotationSystem : ISystem
         return positionComponents;
     }
 
-    private bool CanMove(List<PositionComponent> relatedPositionComponents, Axis axis, out List<Vector3Int> newPositions)
+    private bool CanMove(List<PositionComponent> relatedPositionComponents, (Axis, int) axis,
+        out List<Vector3Int> newPositions)
     {
         newPositions = new List<Vector3Int>();
         var com = Vector3Int.zero;
@@ -76,7 +80,8 @@ public class RotationSystem : ISystem
             newPositions.Add(newPos);
             if (!GameWorld.CanMoveTo(relatedPositionComponents, newPos))
             {
-                Debug.LogError($"cant move {positionComponent.gameObject.name} with pos:{positionComponent.position} to {newPos}");
+                Debug.LogError(
+                    $"cant move {positionComponent.gameObject.name} with pos:{positionComponent.position} to {newPos}");
                 return false;
             }
         }
@@ -84,56 +89,61 @@ public class RotationSystem : ISystem
         return true;
     }
 
-    private Vector3Int GetRotatedPosition(PositionComponent pos, Vector3Int com, Axis axis)
+    //just move along 
+    //based on the camera angle
+    private Vector3Int GetRotatedPosition(PositionComponent pos, Vector3Int com, (Axis, int) axis)
     {
         var intPos = pos.position - com;
         var newPos = Vector3Int.zero;
-        switch (axis)
+        switch (axis.Item1)
         {
             case Axis.X:
-                newPos = RotateAroundX(intPos, Radians);
+                newPos = RotateAroundX(intPos, axis.Item2);
                 break;
 
             case Axis.Y:
-                newPos = RotateAroundY(intPos, Radians);
+                newPos = RotateAroundY(intPos, axis.Item2);
                 break;
 
             case Axis.Z:
-                newPos = RotateAroundZ(intPos, Radians);
+                newPos = RotateAroundZ(intPos, axis.Item2);
                 break;
         }
 
         return newPos + com;
     }
 
-    private Vector3Int RotateAroundX(Vector3Int position, float radians)
+    private Vector3Int RotateAroundX(Vector3Int position, int sign)
     {
+        var rad = Radians * Mathf.Sign(sign);
         var newX = position.x;
-        var newY = position.y * Mathf.Cos(radians) - position.z * Mathf.Sin(radians);
-        var newZ = position.y * Mathf.Sin(radians) + position.z * Mathf.Cos(radians);
+        var newY = position.y * Mathf.Cos(rad) - position.z * Mathf.Sin(rad);
+        var newZ = position.y * Mathf.Sin(rad) + position.z * Mathf.Cos(rad);
         return new Vector3Int(newX, (int)newY, (int)newZ);
     }
 
-    private Vector3Int RotateAroundY(Vector3Int position, float radians)
+    private Vector3Int RotateAroundY(Vector3Int position, int sign)
     {
-        var newX = position.x * Mathf.Cos(radians) + position.z * Mathf.Sin(radians);
+        var rad = Radians * Mathf.Sign(sign);
+        var newX = position.x * Mathf.Cos(rad) + position.z * Mathf.Sin(rad);
         var newY = position.y;
-        var newZ = -position.x * Mathf.Sin(radians) + position.z * Mathf.Cos(radians);
+        var newZ = -position.x * Mathf.Sin(rad) + position.z * Mathf.Cos(rad);
         return new Vector3Int((int)newX, newY, (int)newZ);
     }
 
-    private Vector3Int RotateAroundZ(Vector3Int position, float radians)
+    private Vector3Int RotateAroundZ(Vector3Int position, int sign)
     {
-        var newX = position.x * Mathf.Cos(radians) - position.y * Mathf.Sin(radians);
-        var newY = position.x * Mathf.Sin(radians) + position.y * Mathf.Cos(radians);
+        var rad = Radians * Mathf.Sign(sign);
+        var newX = position.x * Mathf.Cos(rad) - position.y * Mathf.Sin(rad);
+        var newY = position.x * Mathf.Sin(rad) + position.y * Mathf.Cos(rad);
         var newZ = position.z;
         return new Vector3Int((int)newX, (int)newY, newZ);
     }
 
-    private Axis RotationAxis()
+    private (Axis, int) RotationAxis()
     {
-        return BlackBoard.lastRotationKey.HasValue
-            ? Settings.keyToRotationAxis[BlackBoard.lastRotationKey.Value]
-            : Axis.Undefined;
+        return BlackBoard.rotationKeyPressed
+            ? Settings.cameraPosToRotationAxis[BlackBoard.CameraPosition]
+            : (Axis.Undefined, 0);
     }
 }

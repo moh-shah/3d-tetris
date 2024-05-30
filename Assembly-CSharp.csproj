@@ -54,11 +54,14 @@
   <ItemGroup>
      <Compile Include="Assets\Systems\ISystem.cs" />
      <Compile Include="Assets\Components\MovementComponent.cs" />
+     <Compile Include="Assets\Systems\BlockDestructionSystem.cs" />
      <Compile Include="Assets\Systems\UpdateSystem.cs" />
+     <Compile Include="Assets\Components\BlockComponent.cs" />
      <Compile Include="Assets\Systems\BoxCollisionSystem.cs" />
      <Compile Include="Assets\Components\BoxCollisionComponent.cs" />
      <Compile Include="Assets\Systems\MovementSystem.cs" />
      <Compile Include="Assets\Systems\BlackBoard.cs" />
+     <Compile Include="Assets\Systems\BlockGenerationSystem.cs" />
      <Compile Include="Assets\Systems\RotationSystem.cs" />
      <Compile Include="Assets\Components\MonoBehaviourComponent.cs" />
      <Compile Include="Assets\Components\RotationComponent.cs" />
@@ -68,6 +71,7 @@
      <Compile Include="Assets\Components\PositionComponent.cs" />
      <Compile Include="Assets\Systems\GameWorld.cs" />
      <Compile Include="Assets\Systems\GravitySystem.cs" />
+     <Compile Include="Assets\Systems\CameraRotationSystem.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity 2020.3.12/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
